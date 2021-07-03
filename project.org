@@ -1,0 +1,27 @@
+#+TITLE: Project
+
+
+* Planning
+There are a few ways to implement the image proccessing
+
+** AutoCad PNGOUT
+_See how fast autocad can output 4 images of the same obj file ong_
+
+Now we don't need a raspberry pi or arduino, instead everything will be done from the host computer.
+
+The webcam will be utilized from the host computer, and controls will be given from the keyboard.
+Press G to enable gesture control for the laptop, V to start visualization, < to decrease size and > to increase size.
+
+Fitting the model to be flat on the bottom would be a bit difficult to calculate though
+
+Factors at play:
+ - Cost
+ - Durability
+ - Feature-rich
+ - Functionality
+
+For live cadding, we have to either:
+ 1. Take 4 rotated screenshots at a time.
+ 2. Split pane view with 1 screenshot and opencv processing.
+
+    switch to tinkerkcad and get rid of the background.
