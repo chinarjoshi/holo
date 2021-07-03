@@ -25,3 +25,17 @@ For live cadding, we have to either:
  2. Split pane view with 1 screenshot and opencv processing.
 
     switch to tinkerkcad and get rid of the background.
+
+** Python libraries
+There are certain python libraries i can use to import the obj files.
+ - pywavefront:
+   * Pros:
+     - Seems easy enough to load in obj files and visualize them
+   * Cons:
+     Restricted to one image taker in pyglet
+
+ - pyopengl:
+   * Pros:
+     - Actual opengl library made for 3d rendering job
+   * Cons:
+     - May end up being resource intensive
