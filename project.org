@@ -39,3 +39,21 @@ There are certain python libraries i can use to import the obj files.
      - Actual opengl library made for 3d rendering job
    * Cons:
      - May end up being resource intensive
+
+* Software Specs
+There are two distinct and equally important aspects of the project
+** Live Cadding Tool
+Integrates into your cadding software
+
+** Pre-exported wavefront rendering
+Use PyOpenGL or PyMesh in order to load the file into the mesh and take distinct screenshots from all sides.
+
+What i see now is that i have to use wavefront and pyglet in order to render the objects
+
+* Library
+There are two options for the back-bone libraries i can use for model rendering
+** OpenGL
+OpenGL sucks pp but you can use it in conjunction with SDL if you need an interface with it.
+
+** Blender Python API
+Only use this if you're able to remove the background and grid lines, and render multiple images on different offsets from the center of the screen.
