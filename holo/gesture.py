@@ -1,8 +1,16 @@
 import os
+from dataclasses import dataclass
+
 import cv2
 import numpy as np
-from tensorflow import keras
 from keras.models import load_model
+from tensorflow import keras
+
+
+@dataclass
+class GestureOutput:
+    gesture: str
+    confidence: int
 
 
 def get_model(path: str = "../models/VGG_cross_validated.h5") -> keras.Model:
@@ -40,21 +48,29 @@ def predict_gesture(image: np.ndarray, model: keras.Model) -> np.int64:
     """
     image = np.array(image, dtype="float32")
     image /= 255
-    pred_array = model.predict(image)
-
-    return np.argmax(pred_array)
+    return model.predict(image)
 
 
-def gesture_names(gestures: tuple = ("Fist", "L", "Okay", "Palm", "Peace")) -> dict:
-    """Maps gestures to their index for use in confidence array."""
+def gesture_names(
+    gestures: tuple = ("retract", "rotate", "right", "expand", "left")
+) -> dict:
+    """Maps gestures to their index for use in confidence array.
+
+    Gesture mapping is as follows:
+      Fist  : retract
+      L     : rotate
+      Okay  : right
+      Palm  : expand
+      Peace : left
+    """
     return {index: gesture for index, gesture in enumerate(gestures)}
 
 
-def map_gestures(confidence_index: np.int64, gesture_names: dict) -> str:
+def map_gestures(confidence_array: np.array, gesture_names: dict) -> tuple:
     """Returns gesture type and confidence given max index from confidence array."""
-    result = gesture_names[confidence_index]
-    # score = float("%0.2f" % (max(pred_array[0]) * 100))
-    return result, 15
+    gesture = gesture_names[np.argmax(confidence_array)]
+    confidence = float("%0.2f" % (max(confidence_array[0]) * 100))
+    return GestureOutput(gesture, confidence)
 
 
 def process_frame(image: np.ndarray = cv2.imread("../images/L.jpg")) -> np.ndarray:
@@ -82,13 +98,13 @@ def prediction_from_camera():
     #     time.sleep(0.1)
     # else:
 
-    for root, dirs, files in os.walk("../images", topdown=False):
-        for name in files:
-            print(os.path.join(root, name))
+    # for root, dirs, files in os.walk("../images", topdown=False):
+    #     for name in files:
+    #         print(os.path.join(root, name))
 
     prediction_index = predict_gesture(image=process_frame(), model=get_model())
     print(
-        map_gestures(confidence_index=prediction_index, gesture_names=gesture_names())
+        map_gestures(confidence_array=prediction_index, gesture_names=gesture_names())
     )
 
 
