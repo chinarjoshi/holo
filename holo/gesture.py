@@ -1,62 +1,82 @@
+import os
 import cv2
 import numpy as np
 from tensorflow import keras
 from keras.models import load_model
 
 
-model = load_model('../models/VGG_cross_validated.h5')
+def get_model(path: str = "../models/VGG_cross_validated.h5") -> keras.Model:
+    """Returns model interface from a path to keras h5 model file.
 
-gestures = {'L_': 'L',
-           'fi': 'Fist',
-           'C_': 'C',
-           'ok': 'Okay',
-           'pe': 'Peace',
-           'pa': 'Palm'
-            }
+    :param path: path to the keras h5 file
+    :type path: str
+    :return: keras model interface
+    :rtype: keras.Model
+    """
+    if os.path.exists(path):
+        return load_model("../models/VGG_cross_validated.h5")
+    else:
+        raise Exception(f"Model not found in relative path: {path}")
 
-gesture_names = {0: 'C',
-                 1: 'Fist',
-                 2: 'L',
-                 3: 'Okay',
-                 4: 'Palm',
-                 5: 'Peace'}
 
-gestures_map = {'Fist' : 0,
-                'L': 1,
-                'Okay': 2,
-                'Palm': 3,
-                'Peace': 4
-                }
+# Open palm for expand, close palm for retract, ok for right, peace for left, L for rotate up and down.
 
-def predict_image(image):
-    image = np.array(image, dtype='float32')
+
+def predict_image(image: np.ndarray, model: keras.Model) -> np.int64:
+    """Returns gesture result and confidence given cv2 image.
+
+    Formats a given image to fit tensorflow image size requireemnts, takes
+    prediction of image from model, finds index of highest confidence value,
+    and finally returns the name after mapping index to gesture name.
+
+    :param image: frame from webcam for processing
+    :param gesture_names: mapping of gesture name to confidence index
+    :param model: pretrained model to return gesture type and confidence
+    :type image: np.ndarray
+    :type gesture_names: dict
+    :type model: keras.Model
+    :return: gesture identification and confidence percentage
+    :rtype: int
+    """
+    image = np.array(image, dtype="float32")
     image /= 255
     pred_array = model.predict(image)
 
-    # model.predict() returns an array of probabilities -
-    # np.argmax grabs the index of the highest probability.
-    result = gesture_names[np.argmax(pred_array)]
+    return np.argmax(pred_array)
 
-    # A bit of magic here - the score is a float, but I wanted to
-    # display just 2 digits beyond the decimal point.
+
+def gesture_names(gestures: tuple = ("Fist", "L", "Okay", "Palm", "Peace")) -> dict:
+    """Maps gestures to their index for use in confidence array."""
+    return {index: gesture for index, gesture in enumerate(gestures)}
+
+
+def map_gestures(confidence_index: np.int64, gesture_names: dict) -> str:
+    """Returns gesture type and confidence given max index from confidence array."""
+    result = gesture_names[confidence_index]
     score = float("%0.2f" % (max(pred_array[0]) * 100))
-    print(f'Result: {result}, Score: {score}')
     return result, score
 
 
+def prediction_from_camera():
+    """Enables webcam and returns transformation type and confidence."""
+    camera = cv2.VideoCapture(0)
 
-#starts the webcam, uses it as video source
-# camera = cv2.VideoCapture(0) #uses webcam for video
+    while camera.isOpened():
+        # ret returns True if camera is running, frame grabs each frame of the video feed
+        running, frame = camera.read()
 
-# while camera.isOpened():
-#     #ret returns True if camera is running, frame grabs each frame of the video feed
-#     ret, frame = camera.read()
+        if not running:
+            break
 
-frame = cv2.imread('../images/L1.jpg')
+        frame = np.stack((frame,)*3, axis=-1)
 
-# frame = np.stack((frame,)*3, axis=-1)
-frame = cv2.resize(frame, (224, 224))
-frame = frame.reshape(1, 224, 224, 3)
-prediction, score = predict_image(frame)
+    else:
+        frame = cv2.imread("../images/L.jpg")
 
-# objects = {image: cv2.imread(f'../images/{image}.jpeg') for image in ('fist', 'palm', 'peace', 'ok')}
+        frame = cv2.resize(frame, (224, 224))
+        frame = frame.reshape(1, 224, 224, 3)
+        prediction, score = predict_image(frame, gesture_names, get_model())
+
+
+if __name__ == "__main__":
+    print(prediction_from_camera())
