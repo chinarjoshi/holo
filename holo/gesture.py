@@ -103,10 +103,7 @@ def prediction_from_camera():
     #         print(os.path.join(root, name))
 
     prediction_index = predict_gesture(image=process_frame(), model=get_model())
-    print(
-        map_gestures(confidence_array=prediction_index, gesture_names=gesture_names())
-    )
-
+    return(map_gestures(confidence_array=prediction_index, gesture_names=gesture_names()))
 
 if __name__ == "__main__":
     print(prediction_from_camera())
