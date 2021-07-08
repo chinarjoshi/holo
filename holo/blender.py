@@ -1,6 +1,5 @@
 import bpy
 
-
 context = bpy.context.copy()
 
 for area in bpy.context.screen.areas:
