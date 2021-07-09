@@ -1,6 +1,19 @@
 import bpy
-from gestures import prediction_from_camera
+import sys
+import os
+import imp
 
+# HACK
+dir = os.path.dirname(bpy.data.filepath)
+if not dir in sys.path:
+    sys.path.apend(dir)
+
+import gestures
+imp.reload(gestures)
+
+
+for gesture in gestures.prediction_from_camera():
+    print(gesture.gesture, gesture.confidence)
 
 context = bpy.context.copy()
 
