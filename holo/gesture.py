@@ -13,7 +13,7 @@ class GestureOutput:
     gesture: str
     confidence: int
 
-    def __repr__():
+    def __repr__(self):
         return f'gesture: {self.gesture}, confidence: {self.confidence}%'
 
 
@@ -34,7 +34,7 @@ def get_model(path: str = "../models/VGG_cross_validated.h5") -> keras.Model:
 def predict_gesture(image: np.ndarray, model: keras.Model) -> np.int64:
     """Returns gesture result and confidence given cv2 image.
 
-    Formats a given image to fit tensorflow image size requireemnts, takes
+    Formats a given image to fit tensorflow image size requirements, takes
     prediction of image from model, finds index of highest confidence value,
     and finally returns the name after mapping index to gesture name.
 
@@ -52,9 +52,7 @@ def predict_gesture(image: np.ndarray, model: keras.Model) -> np.int64:
     return model.predict(image)
 
 
-def gesture_names(
-    gestures: tuple = ("retract", "rotate", "right", "expand", "left")
-) -> dict:
+def gesture_names(return_transformations: bool = True) -> dict:
     """Maps gestures to their index for use in confidence array.
 
     Gesture mapping is as follows:
@@ -64,7 +62,10 @@ def gesture_names(
       Palm  : expand
       Peace : left
     """
-    return {index: gesture for index, gesture in enumerate(gestures)}
+    transformations = ('retract', 'rotate', 'right', 'expand', 'left')
+    gestures = ('Fist', 'L', 'Okay', 'Palm', 'Peace')
+    return {index: gesture
+            for index, gesture in enumerate(transformations if return_transformations else gestures)}
 
 
 def map_gestures(confidence_array: np.array, gesture_names: dict) -> tuple:
@@ -81,24 +82,14 @@ def process_frame(image: np.ndarray) -> np.ndarray:
     return frame
 
 
-def prediction_from_camera():
+def prediction_from_camera() -> GestureOutput:
     """Enables webcam and returns transformation type and confidence."""
     camera = cv2.VideoCapture(0)
     model = get_model()
-    while True: #camera.isOpened():
-        # ret returns True if camera is running, frame grabs each frame of the video feed
-        ret, frame = camera.read()
-        # cv2.imshow('image', frame)
-
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
-
+    while camera.isOpened():
+        _, frame = camera.read()
         prediction_index = predict_gesture(image=process_frame(frame), model=model)
-        print(map_gestures(confidence_array=prediction_index, gesture_names=gesture_names()))
-        # time.sleep(.01)
-        # print(camera.isOpened())
-    camera.release()
-    cv2.destroyAllWindows()
+        yield map_gestures(confidence_array=prediction_index, gesture_names=gesture_names(return_transformations=False))
 
 if __name__ == "__main__":
     print(prediction_from_camera())
