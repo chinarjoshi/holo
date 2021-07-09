@@ -71,12 +71,12 @@ def gesture_names(return_transformations: bool = True) -> dict:
 def map_gestures(confidence_array: np.array, gesture_names: dict) -> tuple:
     """Returns gesture type and confidence given max index from confidence array."""
     gesture = gesture_names[np.argmax(confidence_array)]
-    confidence = round(max(confidence_array[0] * 100))
+    confidence = float("%0.2f" % (max(confidence_array[0]) * 100))
     return GestureOutput(gesture, confidence)
 
 
 def process_frame(image: np.ndarray) -> np.ndarray:
-    # frame = np.stack((image,) * 3, axis=-1)
+    frame = np.stack((image,) * 3, axis=-1)
     frame = cv2.resize(image, (224, 224))
     frame = frame.reshape(1, 224, 224, 3)
     return frame
@@ -92,5 +92,4 @@ def prediction_from_camera() -> GestureOutput:
         yield map_gestures(confidence_array=prediction_index, gesture_names=gesture_names(return_transformations=False))
 
 if __name__ == "__main__":
-    for gesture in prediction_from_camera():
-        print(gesture.gesture, gesture.confidence)
+    print(prediction_from_camera())
