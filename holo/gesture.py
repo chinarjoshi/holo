@@ -91,6 +91,7 @@ def prediction_from_camera() -> GestureOutput:
         prediction_index = predict_gesture(image=process_frame(frame), model=model)
         yield map_gestures(confidence_array=prediction_index, gesture_names=gesture_names(return_transformations=False))
 
+
 if __name__ == "__main__":
     for gesture in prediction_from_camera():
         print(gesture.gesture, gesture.confidence)

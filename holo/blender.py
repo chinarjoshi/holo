@@ -1,5 +1,5 @@
 import bpy
-import gestures
+from gestures import prediction_from_camera
 
 
 context = bpy.context.copy()
@@ -10,6 +10,10 @@ for area in bpy.context.screen.areas:
         break
 else:
     raise Exception('Blender running in headless mode. No 3D view found.')
+
+
+for gesture in prediction_from_camera():
+    print(gesture.gesture, gesture.confidence)
 
 bpy.ops.screen.area_dupli(context, 'INVOKE_DEFAULT')
 
