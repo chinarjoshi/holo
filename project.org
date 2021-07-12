@@ -51,9 +51,33 @@ Use PyOpenGL or PyMesh in order to load the file into the mesh and take distinct
 What i see now is that i have to use wavefront and pyglet in order to render the objects
 
 * Library
+
 There are two options for the back-bone libraries i can use for model rendering
 ** OpenGL
 OpenGL sucks pp but you can use it in conjunction with SDL if you need an interface with it.
 
 ** Blender Python API
 Only use this if you're able to remove the background and grid lines, and render multiple images on different offsets from the center of the screen.
+
+* TODO
+"""Creates blender window that interacts with gesture recognition software.
+
+Sadly every single api call for blender has side effects so it is very difficult
+to manage the current state. Here is what should be implemented
+
+ 0. Gesture recognition runs upon the click of a button through multithreading
+ 1. A new window is spawned to be the size of the monitor we have
+ 2. Using bpy.data, we split the viewbpy.
+
+
+1. bpy.data.window_managers[0].windows[1].screen.areas[0].spaces[0].region_3d.view_camera_offset
+2. bpy.data.objects['Cube'].rotation_euler = Euler((20, 20, 20))
+
+ok so by manipulating bpy.data.object['Cube'], i can efficetly influence all 4 areas of the
+view. That is the only part i have to update, the object orientation and rotation. On the
+other hand, scale and rotation of the camera is handled by the window manager. On the window
+manager i have to offset area 1 view by 90 degrees
+
+so in essesnce i have to manipulate the window manager and the object, both found in
+bpy.data
+"""
