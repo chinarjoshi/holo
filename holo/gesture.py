@@ -4,8 +4,8 @@ from dataclasses import dataclass
 import time
 import cv2
 import numpy as np
-from keras.models import load_model
 from tensorflow import keras
+from keras.models import load_model
 
 
 @dataclass
