@@ -5,7 +5,6 @@ from bpy.app.handlers import persistent
 
 
 """
-Steps: # TODO Order steps
  2. offset each camera rotation view to make it square
  3. change initial view_distance to match maximum view potential
  4. rotate each camera view with view_rotation.rotate() to make it 90 degree offsets with 45 degree offsets
@@ -22,40 +21,35 @@ def duplicate_window(window_type: str = 'INVOKE_DEFAULT') -> None:
 
 def convert_quadview(area: SpaceView3D) -> None:
     """Converts a given window into quad-view."""
-    # Isolates rendering window from the selected area
     region = [region for region in RENDER_AREA.regions if region.type == 'WINDOW'][0]
     override = {'area': RENDER_AREA, 'region': region, 'edit_object': bpy.context.edit_object}
     bpy.ops.screen.region_quadview(override)
 
 
 def configure_scene(screen_data: SpaceView3D) -> None:
+    """Removes all overlay elements from the 3D viewport."""
     screen_data.shading.background_type = 'VIEWPORT'
     screen_data.shading.background_color = (0, 0, 0)
     screen_data.overlay.show_overlays = False
     for attribute in 'show_gizmo', 'show_region_toolbar', 'show_region_tool_header':
         setattr(screen_data, attribute, False)
 
+# if __name__ == '__main__':
 duplicate_window()
 RENDER_AREA = bpy.data.window_managers[0].windows[-1].screen.areas[0]
 QUAD_VIEWS = RENDER_AREA.spaces[0].region_quadviews
 convert_quadview(area=RENDER_AREA)
 configure_scene(screen_data=RENDER_AREA.spaces[0])
 
-
-for view in bpy.data.window_managers[0].windows[-1].screen.areas[0].spaces[0].region_quadviews:
-    """Change quad view values here"""
-    pass
-
-
-
-
+def initial_config(values: json):
+    with open('config/init.json') as file:
+        config = json.load(file)
+    for index, window in enumerate(config):
+        for key, attribute in window.values():
+            setattr(QUAD_VIEWS[index], key, attribute)
 
 
-bpy.data.window_managers[0].windows[1].screen.areas[0].spaces[0].region_3d.view_rotation.rotate(Euler((1, 10, .1)))
-
-# ok for now assume that there is a fullscreened quad view on window index 1
-
-bpy.data.window_managers[0].windows[1].screen.areas[0].spaces[0].region_3d.view_distance
+# bpy.data.window_managers[0].windows[1].screen.areas[0].spaces[0].region_3d.view_rotation.rotate(Euler((1, 10, .1)))
 
 for window in bpy.data.window_managers[0].windows: # let's find what's what
     for area in window.screen.areas:
