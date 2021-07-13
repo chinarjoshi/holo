@@ -1,7 +1,8 @@
 import bpy
 import json
-from bpy.types import SpaceView3D, Quaternion, Matrix
+from bpy.types import SpaceView3D
 from bpy.app.handlers import persistent
+from mathutils import Quaternion, Matrix, Vector
 
 
 def duplicate_window(window_type: str = 'INVOKE_DEFAULT') -> None:
@@ -30,7 +31,8 @@ def configure_scene(screen_data: SpaceView3D) -> None:
 def initial_config(values: list) -> None:
     for index, window in enumerate(values):
         for key, attribute in window.items():
-            setattr(QUAD_VIEWS[index], key, attribute)
+            if key not in {'perspective_matrix', 'window_matrix'}:
+                setattr(QUAD_VIEWS[index], key, attribute)
 
 
 if __name__ == '__main__':
@@ -46,7 +48,7 @@ if __name__ == '__main__':
             (0.180816650390625, 1.67820405960083, 1.8021012544631958, -0.2884082496166229),
             (0.957085371017456, 0.15791277587413788, -0.24308671057224274, 5.14061975479126),
                                         (0.9570661783218384, 0.15790961682796478, -0.24308183789253235, 5.160516262054443))),
-            "view_distance": 4.183098793029785,
+            "view_distance": 4,
             "view_location": Vector((-1.1843680143356323, 0.5826243758201599, -0.2636926770210266)),
             "view_matrix": Matrix(((0.28046655654907227, -0.7163167595863342, 0.6389278173446655, 0.917999804019928),
             (0.07323073595762253, 0.6796725988388062, 0.7298509478569031, -0.11680532991886139),
@@ -64,7 +66,7 @@ if __name__ == '__main__':
             (1.6992019414901733, 0.4048176407814026, -1.745126724243164, -0.6900960206985474),
             (0.03147741034626961, -0.9799830913543701, -0.19667792320251465, 5.288571357727051),
                                         (0.03147678077220917, -0.979963481426239, -0.19667398929595947, 5.308465003967285))),
-            "view_distance": 1.681093692779541,
+            "view_distance": 4,
             "view_location": Vector((-0.6476320624351501, 3.713759183883667, -0.16454876959323883)),
             "view_matrix": Matrix(((0.7248599529266357, -0.11309938877820969, 0.6795487999916077, 1.0012853145599365),
             (0.6881767511367798, 0.16395112872123718, -0.7067762613296509, -0.27948886156082153),
@@ -82,7 +84,7 @@ if __name__ == '__main__':
             (2.1930031776428223, 0.23790904879570007, 1.109400987625122, 0.00046116337762214243),
             (0.006154918111860752, 0.9752073884010315, -0.22129832208156586, 6.274174213409424),
                                         (0.0061547947116196156, 0.9751878380775452, -0.22129389643669128, 6.294048309326172))),
-            "view_distance": 6.023662567138672,
+            "view_distance": 4,
             "view_location": Vector((0.494803786277771, -0.47912198305130005, -0.8757699131965637)),
             "view_matrix": Matrix(((0.45948129892349243, -0.19931122660636902, -0.8655357360839844, -1.0808576345443726),
             (0.8881661891937256, 0.09635315835475922, 0.4493073523044586, 0.00018677115440368652),
@@ -100,7 +102,7 @@ if __name__ == '__main__':
             (-0.1070108637213707, 1.917167067527771, -1.5523052215576172, 0.10223301500082016),
             (-0.962533175945282, -0.2010997086763382, -0.18201333284378052, 4.386408805847168),
                                         (-0.9625139236450195, -0.20109568536281586, -0.18200968205928802, 4.406320571899414))),
-            "view_distance": 6.023662567138672,
+            "view_distance": 4,
             "view_location": Vector((-1.2986540794372559, -0.9290060997009277, -0.9919807314872742)),
             "view_matrix": Matrix(((0.2677474319934845, -0.597228467464447, -0.7560617923736572, -0.9571163654327393),
             (-0.04333939775824547, 0.7764526009559631, -0.6286835670471191, 0.0414043664932251),
@@ -129,37 +131,8 @@ for window in bpy.data.window_managers[0].windows: # let's find what's what
 
 @persistent # This makes it stay if another file is opened
 def update_handler(dummy):
-    for every_view in quad_views:
-        every_view.view_location = main_view.view_location
-        every_view.view_distance = main_view.view_distance
-
-    [area for area in bpy.data.window_managers[0].windows[0].screen.areas if area.type == 'VIEW_3D'][0]
-
-
+    for every_view in QUAD_VIEWS:
+        every_view.view_location = MAIN_VIEW.view_location
+        every_view.view_distance = MAIN_VIEW.view_distance
 
 bpy.app.handlers.frame_change_post.append(update_handler)
-#bpy.app.handlers.scene_update_post.remove(update_handler)
-
-# Original working
-# context_window = bpy.context.copy()
-# context_window['area'] = [area for area in bpy.context.screen.areas if area.type == 'VIEW_3D'][0]
-# bpy.ops.screen.area_dupli(context_window, 'INVOKE_DEFAULT')
-
-# for area in bpy.data.window_managers[0].windows[-1].screen.areas:
-#     if area.type == 'VIEW_3D':
-#         for region in area.regions:
-#             if region.type == 'WINDOW':
-#                 override = {'area': area, 'region': region, 'edit_object': bpy.context.edit_object}
-#                 bpy.ops.screen.region_quadview(override)
-# area = [area for area in bpy.data.window_managers[0].windows[-1].screen.areas if area.type == 'VIEW_3D']
-
-# # def set_scene(
-# #         screen_data: SpaceView3D = bpy.data.window_managers[0].windows[-1].screen.areas[0].spaces[0]
-# # ) -> None:
-# screen_data = bpy.data.window_managers[0].windows[-1].screen.areas[0].spaces[0]
-# screen_data.shading.background_type = 'VIEWPORT'
-# screen_data.shading.background_color = (0, 0, 0)
-# screen_data.show_gizmo = False
-# screen_data.overlay.show_overlays = False
-# screen_data.show_region_toolbar = False
-# screen_data.show_region_tool_header = False
