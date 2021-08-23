@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="#">
-    <img src="images/logo.png" alt="Logo" width="95" height="95">
+    <img src="images/logo.png" alt="Logo" width="200" height="200">
   </a>
 
   <h1 align="center">HOLO</h1>
