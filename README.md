@@ -119,26 +119,6 @@ TUE 13:
 WED 14:
 THU 15: _FINAL PRESENTATION_
 
-## Concentration specific development
-
-### Mechatronics
-Setting up proper power supply for the display and making sure the arduino and bluetooth module is function and wired properly.
-#### Hardest component
-Getting the aspect ratio and getting proper trapezoids put together. _USE LASER CUTTER_.
-
-### Software
-Creating web application for loading in the CAD file and mapping it out onto the LCD screen. As the brunt of the work is rotating 4 flat models onto the LCD for the hologram, this should be relatively quick.
-#### Hardest component
-Using computer vision to map out hand gestures.
-
-### Design
-Make sure that all of the connection and structures are properly supported
-CAD modeling in fusion 360 the overall design and doing some image manipulation.
-
-#### Hardest component
-Getting the actual holographic display to align, probably going to be gesture control and making sure everything is wired properly
-
-
 ## Getting Started
 
 ### Prerequisites
